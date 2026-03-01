@@ -1,0 +1,33 @@
+name: Automated Daily Update
+
+on:
+  schedule:
+    # Runs at 05:30 UTC every day. 
+    # (Uses specific hours/minutes as required by your task)
+    - cron: '30 5 * * *'
+  workflow_dispatch: # This allows you to run it manually for the check
+
+jobs:
+  automated_commit_job:
+    runs-on: ubuntu-latest
+    
+    # Permissions required to allow the action to push changes
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # CRITICAL: This step name MUST contain your email for the validator to pass
+      - name: Update task for 23f3000360@ds.study.iitm.ac.in
+        run: |
+          echo "Last sync: $(date)" > sync_log.txt
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add sync_log.txt
+          git commit -m "Automated update for 23f3000360@ds.study.iitm.ac.in"
+          git push
